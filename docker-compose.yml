@@ -1,0 +1,51 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: produtos_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: produtos_db
+    ports:
+      - "5433:5432"        # ← 5433 na sua máquina, 5432 dentro do container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d produtos_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: produtos_backend
+    environment:
+      PORT: 3001
+      DB_HOST: db
+      DB_PORT: 5432        # ← comunicação interna, sempre 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: produtos_db
+    ports:
+      - "3001:3001"        # ← longe de qualquer conflito
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: produtos_frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

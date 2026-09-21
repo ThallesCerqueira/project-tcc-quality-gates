@@ -1,0 +1,47 @@
+services:
+
+  db_test:
+    image: postgres:16-alpine
+    container_name: produtos_db_test
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: produtos_db_test 
+
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d produtos_db_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  backend_test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: produtos_backend_test
+
+    environment:
+      PORT: 3001
+      DB_HOST: db_test
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: produtos_db_test
+
+    ports:
+      - "3002:3001"
+
+    depends_on:
+      db_test:
+        condition: service_healthy
+
+    restart: on-failure

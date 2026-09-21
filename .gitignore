@@ -1,0 +1,97 @@
+# =========================
+# Node.js / Frontend / Backend
+# =========================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+backend/node_modules/
+frontend/node_modules/
+
+# Build frontend
+frontend/dist/
+frontend/build/
+
+# =========================
+# Java / Maven / RestAssured
+# =========================
+
+api-tests/target/
+*.class
+*.jar
+*.war
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# Variáveis de ambiente
+# =========================
+
+.env
+.env.*
+!.env.example
+
+backend/.env
+frontend/.env
+api-tests/.env
+
+# =========================
+# Logs
+# =========================
+
+*.log
+logs/
+backend.log
+
+# =========================
+# Relatórios e artefatos de teste
+# =========================
+
+api-tests/target/surefire-reports/
+test-results/
+coverage/
+reports/
+
+# =========================
+# IDEs
+# =========================
+
+.idea/
+*.iml
+
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.project
+.classpath
+.settings/
+
+# =========================
+# Sistema operacional
+# =========================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Docker
+# =========================
+
+*.pid
+
+# =========================
+# Arquivos temporários
+# =========================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
