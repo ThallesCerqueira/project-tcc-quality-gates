@@ -41,6 +41,7 @@ public class ProductTest extends BaseTest {
     public void postProductTest() {
 
         assertEquals(201, response.statusCode());
+        assertThat(response.path("id"), notNullValue());
 
     }
 
