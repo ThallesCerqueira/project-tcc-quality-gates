@@ -8,6 +8,6 @@ public abstract class BaseTest {
     @BeforeAll
     static void configurarApi() {
         RestAssured.baseURI = System.getenv()
-                .getOrDefault("BASE_URL", "http://localhost:3002");
+                .getOrDefault("BASE_URL", "http://localhost:3001");
     }
 }

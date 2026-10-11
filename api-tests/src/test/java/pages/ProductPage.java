@@ -7,6 +7,7 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 
 public class ProductPage {
@@ -65,20 +66,94 @@ public class ProductPage {
 
     public Response getAllProducts() {
 
-        return given()
-                .when()
-                .get(ENDPOINT)
-                .then()
-                .extract().response();
+        return
+                given()
+                        .when()
+                        .get(ENDPOINT)
+                        .then()
+                        .extract().response();
     }
 
     public Response getByProductId(int productId) {
-        return given()
-                .when()
-                .get(ENDPOINT + "/" + productId)
-                .then()
-                .extract()
-                .response();
+        return
+                given()
+                        .when()
+                        .get(ENDPOINT + "/" + productId)
+                        .then()
+                        .extract()
+                        .response();
+    }
+
+    public Response createProductWithoutName() {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.remove("nome");
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .post(ENDPOINT)
+                        .then()
+                        .extract().response()
+                ;
+
+
+    }
+
+    public Response createProductWithoutPrice() {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.remove("preco");
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .post(ENDPOINT)
+                        .then()
+                        .extract().response()
+                ;
+
+
+    }
+
+    public Response createProductWithNegativePrice() {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.put("preco", precoProduto * (-1));
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .post(ENDPOINT)
+                        .then()
+                        .extract().response()
+                ;
+
+
+    }
+
+    public Response createProductWithNegativeQuantity() {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.put("quantidade", quantidadeProduto * (-1));
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .post(ENDPOINT)
+                        .then()
+                        .extract().response()
+                ;
+
+
     }
 
     private Map<String, Object> setParamsProduct() {
@@ -93,6 +168,66 @@ public class ProductPage {
 
         return payloadProduct;
 
+    }
+
+    public Response putProductWithNegativePrice(int productId) {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.put("preco", precoProduto * (-1));
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .put(ENDPOINT + "/" + productId)
+                        .then()
+                        .extract().response();
+    }
+
+    public Response putProductWithNegativeQuantity(int productId) {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.put("quantidade", quantidadeProduto * (-1));
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .put(ENDPOINT + "/" + productId)
+                        .then()
+                        .extract().response();
+    }
+
+    public Response putProductWithoutName(int productId) {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.remove("nome");
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .put(ENDPOINT + "/" + productId)
+                        .then()
+                        .extract().response();
+    }
+
+    public Response putProductWithoutPrice(int productId) {
+
+        payloadProduct = setParamsProduct();
+        payloadProduct.remove("preco");
+
+        return
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(payloadProduct)
+                        .when()
+                        .put(ENDPOINT + "/" + productId)
+                        .then()
+                        .extract().response();
     }
 
 }
