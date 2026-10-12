@@ -1,5 +1,6 @@
 package tests;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import utils.BaseTest;
 
@@ -9,6 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class HealthTest extends BaseTest {
 
     @Test
+    @Tag("critical")
     public void deveRetornarStatus200NoHealthCheck() {
 
         given()

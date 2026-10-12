@@ -9,5 +9,11 @@ public abstract class BaseTest {
     static void configurarApi() {
         RestAssured.baseURI = System.getenv()
                 .getOrDefault("BASE_URL", "http://localhost:3001");
+
+
+        RestAssured.filters(
+                new Unexpected5xxFilter()
+        );
+
     }
 }
