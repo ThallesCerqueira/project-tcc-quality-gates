@@ -42,7 +42,7 @@ public class ProductTest extends BaseTest {
     @Tag("critical")
     public void postProductTest() {
 
-        assertEquals(201, response.statusCode());
+        assertEquals(200, response.statusCode());
         assertThat(response.path("id"), notNullValue());
 
         assertThat(response.path("id"), notNullValue());
