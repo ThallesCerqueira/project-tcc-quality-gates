@@ -97,10 +97,17 @@ jobs:
           cache: maven
 
       - name: Executar testes RestAssured
+        continue-on-error: true
         working-directory: api-tests
         run: mvn clean test
         env:
           BASE_URL: http://localhost:3001
+
+      # ── Quality Gate ─────────────────────────
+      - name: Avaliar Quality Gate
+        if: always()
+        working-directory: api-tests
+        run: bash scripts/quality-gate.sh
 
       # ── Artefatos ────────────────────────────
       - name: Publicar resultados dos testes
@@ -114,7 +121,7 @@ jobs:
 
   # ─────────────────────────────────────────────
   # JOB 2: Build das imagens
-  # Executado somente se os testes passarem
+  # Executado somente se o Quality Gate for aprovado
   # ─────────────────────────────────────────────
   build:
     name: Build Docker
