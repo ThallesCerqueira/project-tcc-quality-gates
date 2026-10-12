@@ -3,6 +3,7 @@ package tests;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pages.ProductPage;
 import utils.BaseTest;
@@ -38,6 +39,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @Tag("critical")
     public void postProductTest() {
 
         assertEquals(201, response.statusCode());
@@ -52,12 +54,13 @@ public class ProductTest extends BaseTest {
         assertThat(response.path("criado_em"), notNullValue());
         assertThat(response.path("atualizado_em"), notNullValue());
 
-        assertThat((Integer) response.path("id"), greaterThan(0));
-        assertThat((Integer) response.path("quantidade"), greaterThanOrEqualTo(0));
+        assertThat(response.path("id"), greaterThan(0));
+        assertThat(response.path("quantidade"), greaterThanOrEqualTo(0));
 
     }
 
     @Test
+    @Tag("critical")
     public void putProductTest() {
 
         response = productPage.putProduct(productId);
@@ -66,6 +69,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @Tag("critical")
     public void deleteProductIdTest() {
 
         shouldDelete = false;
@@ -75,6 +79,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @Tag("critical")
     public void getAllProductsTest() {
 
         response = productPage.getAllProducts();
@@ -84,6 +89,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @Tag("critical")
     public void getByProductIdTest() {
 
         assertEquals(201, response.statusCode());
