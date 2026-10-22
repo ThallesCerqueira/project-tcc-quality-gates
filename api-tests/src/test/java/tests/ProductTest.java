@@ -1,10 +1,7 @@
 package tests;
 
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import pages.ProductPage;
 import utils.BaseTest;
 
@@ -39,6 +36,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-01 - Cadastrar produto com dados válidos")
     @Tag("critical")
     public void postProductTest() {
 
@@ -60,6 +58,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-02 - Atualizar produto com dados válidos")
     @Tag("critical")
     public void putProductTest() {
 
@@ -69,6 +68,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-03 - Excluir produto")
     @Tag("critical")
     public void deleteProductIdTest() {
 
@@ -79,6 +79,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-04 - Listar todos os produtos")
     @Tag("critical")
     public void getAllProductsTest() {
 
@@ -89,6 +90,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-04 - Listar produto específico")
     @Tag("critical")
     public void getByProductIdTest() {
 
@@ -110,6 +112,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-05 - Cadastrar produto sem nome")
     public void createProductWithoutNameTest() {
 
         response = productPage.createProductWithoutName();
@@ -118,6 +121,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-06 - Cadastrar produto sem preço")
     public void createProductWithoutPriceTest() {
 
         response = productPage.createProductWithoutPrice();
@@ -126,6 +130,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-07 - Cadastrar produto com preço negativo")
     public void createProductWithNegativePriceTest() {
 
         response = productPage.createProductWithNegativePrice();
@@ -134,6 +139,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-08 - Cadastrar produto com quantidade negativa")
     public void createProductWithNegativeQuantityTest() {
 
         response = productPage.createProductWithNegativeQuantity();
@@ -142,6 +148,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-09 - Listar produto inexistente")
     public void getProductByInexistentIdTest() {
 
         response = productPage.getByProductId(productId + 99);
@@ -150,6 +157,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-10 - Atualizar produto inexistente")
     public void updateInexistentProductTest() {
 
       response = productPage.putProduct(productId + 123);
@@ -158,6 +166,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-11 - Atualizar produto e validar persistência dos dados")
     public void putProductPersistenceTest() {
 
         Response putResponse = productPage.putProduct(productId);
@@ -173,6 +182,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-12 - Atualizar produto com preço negativo")
     public void updateProductWithNegativePriceTest() {
 
         response = productPage.putProductWithNegativePrice(productId);
@@ -181,6 +191,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-13 - Atualizar produto com quantidade negativa")
     public void updateProductWithNegativeQuantityTest() {
 
         response = productPage.putProductWithNegativeQuantity(productId);
@@ -189,6 +200,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-14 - Atualizar produto sem nome")
     public void updateProductWithoutNameTest() {
 
         response = productPage.putProductWithoutName(productId);
@@ -197,6 +209,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-15 - Atualizar produto sem preço")
     public void updateProductWithoutPriceTest() {
 
         response = productPage.putProductWithoutPrice(productId);
@@ -205,6 +218,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-16 - Excluir produto inexistente")
     public void deleteInexistentProductTest() {
 
         response = productPage.deleteProductId(productId + 999);
@@ -213,6 +227,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("TF-17 - Excluir produto e confirmar exclusão")
     public void deleteProductAndConfirmDeletionTest() {
 
         response = productPage.deleteProductId(productId);
