@@ -115,7 +115,11 @@ jobs:
         if: always()
         with:
           name: resultados-testes-api
-          path: api-tests/target/surefire-reports/
+          path:
+            api-tests/target/test-report.html
+            api-tests/target/quality-gate.properties
+            api-tests/target/unexpected-5xx.log
+            api-tests/target/surefire-reports/
           retention-days: 7
 
 
