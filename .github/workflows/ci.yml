@@ -109,13 +109,19 @@ jobs:
         working-directory: api-tests
         run: bash scripts/quality-gate.sh
 
+      - name: Verificar arquivos gerados
+        if: always()
+        run: |
+          echo "=== Arquivos gerados ==="
+          find api-tests/target -maxdepth 2 -type f
+
       # ── Artefatos ────────────────────────────
       - name: Publicar resultados dos testes
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: resultados-testes-api
-          path:
+          path: |
             api-tests/target/test-report.html
             api-tests/target/quality-gate.properties
             api-tests/target/unexpected-5xx.log
