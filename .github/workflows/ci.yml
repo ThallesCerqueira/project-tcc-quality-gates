@@ -3,6 +3,7 @@ name: CI — Testes de API
 on:
   push:
     branches: [main, develop]
+
   pull_request:
     branches: [main]
 
@@ -10,7 +11,6 @@ jobs:
 
   # ─────────────────────────────────────────────
   # JOB 1: Testes automatizados da API
-  # Java + RestAssured + JUnit 5
   # ─────────────────────────────────────────────
   testes-api:
     name: Testes de API
@@ -109,16 +109,17 @@ jobs:
         working-directory: api-tests
         run: bash scripts/quality-gate.sh
 
+      # ── Verificação ──────────────────────────
       - name: Verificar arquivos gerados
         if: always()
         run: |
           echo "=== Arquivos gerados ==="
           find api-tests/target -maxdepth 2 -type f
 
-      # ── Artefatos ────────────────────────────
+      # ── Artifact comum ───────────────────────
       - name: Publicar resultados dos testes
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: resultados-testes-api
           path: |
@@ -128,9 +129,51 @@ jobs:
             api-tests/target/surefire-reports/
           retention-days: 7
 
+      # ── GitHub Pages ─────────────────────────
+      - name: Preparar relatório para GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          mkdir -p api-tests/pages
+          cp api-tests/target/test-report.html api-tests/pages/index.html
+
+      - name: Configurar GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Enviar relatório para GitHub Pages
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: api-tests/pages
+
 
   # ─────────────────────────────────────────────
-  # JOB 2: Build das imagens
+  # JOB 2: Publicação do relatório HTML
+  # ─────────────────────────────────────────────
+  deploy-report:
+    name: Publicar relatório HTML
+    runs-on: ubuntu-latest
+    needs: testes-api
+
+    if: always() && github.event_name != 'pull_request'
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Publicar relatório
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+
+  # ─────────────────────────────────────────────
+  # JOB 3: Build das imagens
   # Executado somente se o Quality Gate for aprovado
   # ─────────────────────────────────────────────
   build:
