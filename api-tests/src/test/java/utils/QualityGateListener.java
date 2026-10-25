@@ -7,12 +7,12 @@ import org.junit.platform.launcher.TestPlan;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class QualityGateListener implements TestExecutionListener {
 
@@ -28,6 +28,7 @@ public class QualityGateListener implements TestExecutionListener {
     private final List<TestResult> results = new ArrayList<>();
 
     private static class TestResult {
+
         String name;
         String status;
         long duration;
@@ -40,6 +41,16 @@ public class QualityGateListener implements TestExecutionListener {
     }
 
     @Override
+    public void executionStarted(TestIdentifier testIdentifier) {
+
+        if (!testIdentifier.isTest()) {
+            return;
+        }
+
+        startTimes.put(testIdentifier.getUniqueId(), System.currentTimeMillis());
+    }
+
+    @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
 
         if (!testIdentifier.isTest()) {
@@ -48,10 +59,7 @@ public class QualityGateListener implements TestExecutionListener {
 
         totalTests++;
 
-        long start = startTimes.getOrDefault(
-                testIdentifier.getUniqueId(),
-                System.currentTimeMillis()
-        );
+        long start = startTimes.getOrDefault(testIdentifier.getUniqueId(), System.currentTimeMillis());
 
         long duration = System.currentTimeMillis() - start;
 
@@ -70,7 +78,7 @@ public class QualityGateListener implements TestExecutionListener {
                 )
         );
 
-        boolean critical = testIdentifier.getTags().stream().anyMatch(tag -> tag.getName().equals("critical"));
+        boolean critical = testIdentifier.getTags().stream().anyMatch(tag -> tag.getName().equalsIgnoreCase("critical"));
 
         if (critical) {
             criticalTotal++;
@@ -98,207 +106,408 @@ public class QualityGateListener implements TestExecutionListener {
         try {
 
             Path directory = Path.of("target");
+
             Files.createDirectories(directory);
 
-            String result =
-                    "total_tests=" + totalTests + "\n" +
-                            "passed_tests=" + passedTests + "\n" +
-                            "failed_tests=" + failedTests + "\n" +
-                            "aborted_tests=" + abortedTests + "\n" +
-                            "critical_total=" + criticalTotal + "\n" +
-                            "critical_passed=" + criticalPassed + "\n";
-
-            Files.writeString(
-                    Path.of("target", "quality-gate.properties"),
-                    result
-            );
+            generateQualityGateProperties();
 
             generateHtmlReport();
 
         } catch (IOException e) {
+
             throw new RuntimeException(
-                    "Erro ao gerar dados do Quality Gate",
+                    "Erro ao gerar os dados da execução dos testes.",
                     e
             );
         }
     }
 
-    @Override
-    public void executionStarted(TestIdentifier testIdentifier) {
+    private void generateQualityGateProperties()
+            throws IOException {
 
-        if (testIdentifier.isTest()) {
-            startTimes.put(
-                    testIdentifier.getUniqueId(),
-                    System.currentTimeMillis()
-            );
-        }
+        String result =
+                "total_tests=" + totalTests + "\n" +
+                        "passed_tests=" + passedTests + "\n" +
+                        "failed_tests=" + failedTests + "\n" +
+                        "aborted_tests=" + abortedTests + "\n" +
+                        "critical_total=" + criticalTotal + "\n" +
+                        "critical_passed=" + criticalPassed + "\n";
+
+        Files.writeString(
+                Path.of(
+                        "target",
+                        "quality-gate.properties"
+                ),
+                result
+        );
     }
 
-    private void generateHtmlReport() throws IOException {
+    private void generateHtmlReport()
+            throws IOException {
 
-        StringBuilder html = new StringBuilder();
+        StringBuilder html =
+                new StringBuilder();
 
-        String dataExecucao = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        String dataExecucao =
+                LocalDateTime.now()
+                        .format(
+                                DateTimeFormatter.ofPattern(
+                                        "dd/MM/yyyy HH:mm:ss"
+                                )
+                        );
 
-        String versao = System.getenv().getOrDefault(
-                "APP_VERSION",
-                "Execução local"
-        );
+        String versao =
+                System.getenv()
+                        .getOrDefault(
+                                "APP_VERSION",
+                                "Execução local"
+                        );
 
-        String branch = System.getenv().getOrDefault(
-                "GITHUB_REF_NAME",
-                "local"
-        );
+        String branch =
+                System.getenv()
+                        .getOrDefault(
+                                "GITHUB_REF_NAME",
+                                "local"
+                        );
 
-        String commit = System.getenv().getOrDefault(
-                "GITHUB_SHA",
-                "local"
-        );
+        String commit =
+                System.getenv()
+                        .getOrDefault(
+                                "GITHUB_SHA",
+                                "local"
+                        );
 
-        if (!commit.equals("local") && commit.length() > 7) {
-            commit = commit.substring(0, 7);
+        if (!commit.equals("local")
+                && commit.length() > 7) {
+
+            commit =
+                    commit.substring(0, 7);
         }
 
-        String pipeline = System.getenv().getOrDefault(
-                "GITHUB_RUN_NUMBER",
-                "local"
-        );
+        String pipeline =
+                System.getenv()
+                        .getOrDefault(
+                                "GITHUB_RUN_NUMBER",
+                                "local"
+                        );
 
-        String ambiente = System.getenv().getOrDefault(
-                "BASE_URL",
-                "http://localhost:3002"
-        );
+        String ambiente =
+                System.getenv()
+                        .getOrDefault(
+                                "BASE_URL",
+                                "http://localhost:3002"
+                        );
+
+        double percentualAprovacao = 0;
+
+        if (totalTests > 0) {
+
+            percentualAprovacao =
+                    ((double) passedTests / totalTests)
+                            * 100;
+        }
 
         html.append("""
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <title>Relatório de Testes</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 40px;
-                }
-
-                table {
-                    border-collapse: collapse;
-                    width: 100%;
-                }
-
-                th, td {
-                    border: 1px solid #ccc;
-                    padding: 10px;
-                    text-align: left;
-                }
-
-                th {
-                    background: #f2f2f2;
-                }
-
-                .APROVADO {
-                    color: green;
-                    font-weight: bold;
-                }
-
-                .REPROVADO {
-                    color: red;
-                    font-weight: bold;
-                }
-
-                .ABORTADO {
-                    color: orange;
-                    font-weight: bold;
-                }
-            </style>
-        </head>
-
-        <body>
-
-        <h1>Relatório de Execução dos Testes</h1>
-        
-                html.append(""\"
-                    <h2>Identificação da execução</h2>
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                
+                <head>
+                
+                    <meta charset="UTF-8">
+                
+                    <meta
+                        name="viewport"
+                        content="width=device-width, initial-scale=1.0"
+                    >
+                
+                    <title>
+                        Relatório de Execução dos Testes
+                    </title>
+                
+                    <style>
+                
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 40px;
+                            background-color: #f8f9fa;
+                            color: #212529;
+                        }
+                
+                        h1 {
+                            margin-bottom: 30px;
+                        }
+                
+                        h2 {
+                            margin-top: 30px;
+                        }
+                
+                        table {
+                            border-collapse: collapse;
+                            width: 100%;
+                            margin-bottom: 30px;
+                            background-color: white;
+                        }
+                
+                        th,
+                        td {
+                            border: 1px solid #ddd;
+                            padding: 10px;
+                            text-align: left;
+                        }
+                
+                        th {
+                            background-color: #f2f2f2;
+                        }
+                
+                        .APROVADO {
+                            color: green;
+                            font-weight: bold;
+                        }
+                
+                        .REPROVADO {
+                            color: red;
+                            font-weight: bold;
+                        }
+                
+                        .ABORTADO {
+                            color: orange;
+                            font-weight: bold;
+                        }
+                
+                        .resumo {
+                            display: flex;
+                            gap: 15px;
+                            flex-wrap: wrap;
+                            margin-bottom: 30px;
+                        }
+                
+                        .card {
+                            background-color: white;
+                            border: 1px solid #ddd;
+                            border-radius: 6px;
+                            padding: 15px;
+                            min-width: 160px;
+                        }
+                
+                        .card strong {
+                            display: block;
+                            font-size: 22px;
+                            margin-top: 5px;
+                        }
+                
+                    </style>
+                
+                </head>
+                
+                <body>
+                
+                    <h1>
+                        Relatório de Execução dos Testes
+                    </h1>
+                
+                    <h2>
+                        Identificação da execução
+                    </h2>
                 
                     <table>
+                
                         <tr>
                             <th>Informação</th>
                             <th>Valor</th>
                         </tr>
-                    ""\");
-                
-                html.append("<tr><td>Data/Hora</td><td>")
-                        .append(dataExecucao)
-                        .append("</td></tr>");
-                
-                html.append("<tr><td>Versão</td><td>")
-                        .append(versao)
-                        .append("</td></tr>");
-                
-                html.append("<tr><td>Branch</td><td>")
-                        .append(branch)
-                        .append("</td></tr>");
-                
-                html.append("<tr><td>Commit</td><td>")
-                        .append(commit)
-                        .append("</td></tr>");
-                
-                html.append("<tr><td>Execução do pipeline</td><td>#")
-                        .append(pipeline)
-                        .append("</td></tr>");
-                
-                html.append("<tr><td>Ambiente</td><td>")
-                        .append(ambiente)
-                        .append("</td></tr>");
-                
-                html.append(""\"
+                """);
+
+        appendRow(
+                html,
+                "Data/Hora",
+                dataExecucao
+        );
+
+        appendRow(
+                html,
+                "Versão",
+                versao
+        );
+
+        appendRow(
+                html,
+                "Branch",
+                branch
+        );
+
+        appendRow(
+                html,
+                "Commit",
+                commit
+        );
+
+        appendRow(
+                html,
+                "Execução do pipeline",
+                "#" + pipeline
+        );
+
+        appendRow(
+                html,
+                "Ambiente",
+                ambiente
+        );
+
+        html.append("""
                     </table>
                 
-                    <br>
+                    <h2>
+                        Resumo da execução
+                    </h2>
                 
-                    <h2>Resultados dos testes</h2>
-                    ""\");
+                    <div class="resumo">
+                """);
 
-        <table>
+        appendCard(
+                html,
+                "Total",
+                String.valueOf(totalTests)
+        );
 
-        <tr>
-            <th>Teste</th>
-            <th>Status</th>
-            <th>Tempo</th>
-        </tr>
-        """);
+        appendCard(
+                html,
+                "Aprovados",
+                String.valueOf(passedTests)
+        );
+
+        appendCard(
+                html,
+                "Reprovados",
+                String.valueOf(failedTests)
+        );
+
+        appendCard(
+                html,
+                "Abortados",
+                String.valueOf(abortedTests)
+        );
+
+        appendCard(
+                html,
+                "Testes críticos",
+                String.valueOf(criticalTotal)
+        );
+
+        appendCard(
+                html,
+                "Críticos aprovados",
+                String.valueOf(criticalPassed)
+        );
+
+        appendCard(
+                html,
+                "Percentual aprovado",
+                String.format(
+                        "%.2f%%",
+                        percentualAprovacao
+                )
+        );
+
+        html.append("""
+                    </div>
+                
+                    <h2>
+                        Resultados dos testes
+                    </h2>
+                
+                    <table>
+                
+                        <tr>
+                            <th>Teste</th>
+                            <th>Status</th>
+                            <th>Tempo de execução</th>
+                        </tr>
+                """);
 
         for (TestResult result : results) {
 
             html.append("<tr>");
 
             html.append("<td>")
-                    .append(result.name)
+                    .append(escapeHtml(result.name))
                     .append("</td>");
 
-            html.append("<td class='")
+            html.append("<td class=\"")
                     .append(result.status)
-                    .append("'>")
+                    .append("\">")
                     .append(result.status)
                     .append("</td>");
 
             html.append("<td>")
                     .append(result.duration)
-                    .append(" ms</td>");
+                    .append(" ms")
+                    .append("</td>");
 
             html.append("</tr>");
         }
 
         html.append("""
-        </table>
-        </body>
-        </html>
-        """);
+                    </table>
+                
+                </body>
+                
+                </html>
+                """);
 
         Files.writeString(
-                Path.of("target", "test-report.html"),
+                Path.of(
+                        "target",
+                        "test-report.html"
+                ),
                 html.toString()
         );
+    }
+
+    private void appendRow(
+            StringBuilder html,
+            String label,
+            String value) {
+
+        html.append("<tr>");
+
+        html.append("<td>")
+                .append(escapeHtml(label))
+                .append("</td>");
+
+        html.append("<td>")
+                .append(escapeHtml(value))
+                .append("</td>");
+
+        html.append("</tr>");
+    }
+
+    private void appendCard(
+            StringBuilder html,
+            String label,
+            String value) {
+
+        html.append("<div class=\"card\">");
+
+        html.append(escapeHtml(label));
+
+        html.append("<strong>")
+                .append(escapeHtml(value))
+                .append("</strong>");
+
+        html.append("</div>");
+    }
+
+    private String escapeHtml(String value) {
+
+        if (value == null) {
+            return "";
+        }
+
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }
