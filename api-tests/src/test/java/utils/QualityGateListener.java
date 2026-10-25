@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class QualityGateListener implements TestExecutionListener {
 
@@ -136,6 +138,38 @@ public class QualityGateListener implements TestExecutionListener {
 
         StringBuilder html = new StringBuilder();
 
+        String dataExecucao = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+        String versao = System.getenv().getOrDefault(
+                "APP_VERSION",
+                "Execução local"
+        );
+
+        String branch = System.getenv().getOrDefault(
+                "GITHUB_REF_NAME",
+                "local"
+        );
+
+        String commit = System.getenv().getOrDefault(
+                "GITHUB_SHA",
+                "local"
+        );
+
+        if (!commit.equals("local") && commit.length() > 7) {
+            commit = commit.substring(0, 7);
+        }
+
+        String pipeline = System.getenv().getOrDefault(
+                "GITHUB_RUN_NUMBER",
+                "local"
+        );
+
+        String ambiente = System.getenv().getOrDefault(
+                "BASE_URL",
+                "http://localhost:3002"
+        );
+
         html.append("""
         <!DOCTYPE html>
         <html lang="pt-BR">
@@ -183,6 +217,48 @@ public class QualityGateListener implements TestExecutionListener {
         <body>
 
         <h1>Relatório de Execução dos Testes</h1>
+        
+                html.append(""\"
+                    <h2>Identificação da execução</h2>
+                
+                    <table>
+                        <tr>
+                            <th>Informação</th>
+                            <th>Valor</th>
+                        </tr>
+                    ""\");
+                
+                html.append("<tr><td>Data/Hora</td><td>")
+                        .append(dataExecucao)
+                        .append("</td></tr>");
+                
+                html.append("<tr><td>Versão</td><td>")
+                        .append(versao)
+                        .append("</td></tr>");
+                
+                html.append("<tr><td>Branch</td><td>")
+                        .append(branch)
+                        .append("</td></tr>");
+                
+                html.append("<tr><td>Commit</td><td>")
+                        .append(commit)
+                        .append("</td></tr>");
+                
+                html.append("<tr><td>Execução do pipeline</td><td>#")
+                        .append(pipeline)
+                        .append("</td></tr>");
+                
+                html.append("<tr><td>Ambiente</td><td>")
+                        .append(ambiente)
+                        .append("</td></tr>");
+                
+                html.append(""\"
+                    </table>
+                
+                    <br>
+                
+                    <h2>Resultados dos testes</h2>
+                    ""\");
 
         <table>
 
