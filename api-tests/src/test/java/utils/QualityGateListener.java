@@ -207,6 +207,8 @@ public class QualityGateListener implements TestExecutionListener {
                             * 100;
         }
 
+        long unexpected5xx = countUnexpected5xx();
+
         html.append("""
                 <!DOCTYPE html>
                 <html lang="pt-BR">
@@ -408,6 +410,20 @@ public class QualityGateListener implements TestExecutionListener {
                 )
         );
 
+        appendCard(
+                html,
+                "HTTP 5xx inesperados",
+                String.valueOf(unexpected5xx)
+        );
+
+        appendCard(
+                html,
+                "Critério HTTP 5xx",
+                unexpected5xx == 0
+                        ? "ATENDIDO"
+                        : "NÃO ATENDIDO"
+        );
+
         html.append("""
                     </div>
                 
@@ -509,5 +525,21 @@ public class QualityGateListener implements TestExecutionListener {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    private long countUnexpected5xx() throws IOException {
+
+        Path file = Path.of(
+                "target",
+                "unexpected-5xx.log"
+        );
+
+        if (!Files.exists(file)) {
+            return 0;
+        }
+
+        try (var lines = Files.lines(file)) {
+            return lines.count();
+        }
     }
 }
