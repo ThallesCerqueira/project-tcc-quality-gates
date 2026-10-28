@@ -81,7 +81,7 @@ async function atualizarProduto(req, res) {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ erro: 'Produto não encontrado' });
+      return res.status(500).json({ erro: 'Erro interno' });
     }
 
     res.json(result.rows[0]);
