@@ -60,9 +60,13 @@ async function atualizarProduto(req, res) {
   const { id } = req.params;
   const { nome, descricao, preco, quantidade, categoria } = req.body;
 
-  if (!nome || preco === undefined) {
-    return res.status(400).json({ erro: 'Os campos "nome" e "preco" são obrigatórios' });
-  }
+  if (!nome) {
+  return res.status(422).json({ erro: 'O campo "nome" é obrigatório' });
+}
+
+if (preco === undefined) {
+  return res.status(422).json({ erro: 'O campo "preco" é obrigatório' });
+}
 
   if (typeof preco !== 'number' || preco < 0) {
     return res.status(400).json({ erro: 'O campo "preco" deve ser um número maior ou igual a 0' });
