@@ -40,7 +40,7 @@
 
         th,
         td {
-            border: 1px solid #ddd;
+            border: 1px solid #fddd;
             padding: 10px;
             text-align: left;
         }
@@ -85,6 +85,34 @@
             margin-top: 5px;
         }
 
+        .criterio-atendido {
+            color: green;
+            font-weight: bold;
+        }
+
+        .criterio-nao-atendido {
+            color: red;
+            font-weight: bold;
+        }
+
+        .gate-status {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-left: 4px solid;
+            padding: 12px 15px;
+            margin-bottom: 30px;
+        }
+
+        .gate-aprovado {
+            border-left-color: green;
+            color: green;
+        }
+
+        .gate-reprovado {
+            border-left-color: red;
+            color: red;
+        }
+
     </style>
 
 </head>
@@ -105,16 +133,26 @@
             <th>Informação</th>
             <th>Valor</th>
         </tr>
-<tr><td>Data/Hora</td><td>28/10/2026 01:12:52</td></tr><tr><td>Versão</td><td>experimento/v3-http-5xx</td></tr><tr><td>Branch</td><td>experimento/v3-http-5xx</td></tr><tr><td>Commit</td><td>5ad528b</td></tr><tr><td>Execução do pipeline</td><td>#24</td></tr><tr><td>Ambiente</td><td>http://localhost:3001</td></tr>    </table>
+<tr><td>Data/Hora</td><td>28/10/2026 01:40:27</td></tr><tr><td>Versão</td><td>experimento/v3-http-5xx</td></tr><tr><td>Branch</td><td>experimento/v3-http-5xx</td></tr><tr><td>Commit</td><td>f033cca</td></tr><tr><td>Execução do pipeline</td><td>#29</td></tr><tr><td>Ambiente</td><td>http://localhost:3001</td></tr>    </table>
 
     <h2>
         Resumo da execução
     </h2>
 
     <div class="resumo">
-<div class="card">Total<strong>18</strong></div><div class="card">Aprovados<strong>17</strong></div><div class="card">Reprovados<strong>1</strong></div><div class="card">Abortados<strong>0</strong></div><div class="card">Testes críticos<strong>6</strong></div><div class="card">Críticos aprovados<strong>6</strong></div><div class="card">Percentual aprovado<strong>94.44%</strong></div><div class="card">HTTP 5xx inesperados<strong>1</strong></div><div class="card">Critério HTTP 5xx<strong>NÃO ATENDIDO</strong></div>    </div>
+<div class="card">Total<strong>18</strong></div><div class="card">Aprovados<strong>17</strong></div><div class="card">Reprovados<strong>1</strong></div><div class="card">Testes críticos<strong>6</strong></div><div class="card">Críticos aprovados<strong>6</strong></div><div class="card">Percentual aprovado<strong>94.44%</strong></div><div class="card">HTTP 5xx inesperados<strong>1</strong></div>    </div>
 
     <h2>
+        Avaliação do Quality Gate
+    </h2>
+
+    <table>
+
+        <tr>
+            <th>Critério</th>
+            <th>Resultado</th>
+        </tr>
+<tr><td>100% dos testes críticos aprovados</td><td class="criterio-atendido">ATENDIDO</td></tr><tr><td>Pelo menos 90% da suíte aprovada</td><td class="criterio-atendido">ATENDIDO</td></tr><tr><td>Nenhum HTTP 5xx inesperado</td><td class="criterio-nao-atendido">NÃO ATENDIDO</td></tr></table><div class="gate-status gate-reprovado"><strong>Quality Gate: REPROVADO</strong></div>    <h2>
         Resultados dos testes
     </h2>
 
@@ -125,7 +163,7 @@
             <th>Status</th>
             <th>Tempo de execução</th>
         </tr>
-<tr><td>TF-12 - Atualizar produto e validar persistência dos dados</td><td class="APROVADO">APROVADO</td><td>1241 ms</td></tr><tr><td>TF-03 - Excluir produto e confirmar exclusão</td><td class="APROVADO">APROVADO</td><td>52 ms</td></tr><tr><td>TF-09 - Cadastrar produto com quantidade negativa</td><td class="APROVADO">APROVADO</td><td>43 ms</td></tr><tr><td>TF-13 - Atualizar produto com preço negativo</td><td class="APROVADO">APROVADO</td><td>41 ms</td></tr><tr><td>TF-17 - Excluir produto inexistente</td><td class="APROVADO">APROVADO</td><td>40 ms</td></tr><tr><td>TF-14 - Atualizar produto com quantidade negativa</td><td class="APROVADO">APROVADO</td><td>42 ms</td></tr><tr><td>TF-06 - Cadastrar produto sem nome</td><td class="APROVADO">APROVADO</td><td>39 ms</td></tr><tr><td>TF-08 - Cadastrar produto com preço negativo</td><td class="APROVADO">APROVADO</td><td>31 ms</td></tr><tr><td>TF-01 - Cadastrar produto com dados válidos</td><td class="APROVADO">APROVADO</td><td>97 ms</td></tr><tr><td>TF-16 - Atualizar produto sem preço</td><td class="APROVADO">APROVADO</td><td>35 ms</td></tr><tr><td>TF-10 - Listar produto inexistente</td><td class="APROVADO">APROVADO</td><td>32 ms</td></tr><tr><td>TF-04 - Listar todos os produtos</td><td class="APROVADO">APROVADO</td><td>36 ms</td></tr><tr><td>TF-07 - Cadastrar produto sem preço</td><td class="APROVADO">APROVADO</td><td>27 ms</td></tr><tr><td>TF-15 - Atualizar produto sem nome</td><td class="APROVADO">APROVADO</td><td>26 ms</td></tr><tr><td>TF-02 - Atualizar produto com dados válidos</td><td class="APROVADO">APROVADO</td><td>28 ms</td></tr><tr><td>TF-05 - Listar produto específico</td><td class="APROVADO">APROVADO</td><td>95 ms</td></tr><tr><td>TF-11 - Atualizar produto inexistente</td><td class="REPROVADO">REPROVADO</td><td>37 ms</td></tr><tr><td>TF-00 - Validar status do sistema</td><td class="APROVADO">APROVADO</td><td>46 ms</td></tr>    </table>
+<tr><td>TF-12 - Atualizar produto e validar persistência dos dados</td><td class="APROVADO">APROVADO</td><td>1701 ms</td></tr><tr><td>TF-03 - Excluir produto e confirmar exclusão</td><td class="APROVADO">APROVADO</td><td>51 ms</td></tr><tr><td>TF-09 - Cadastrar produto com quantidade negativa</td><td class="APROVADO">APROVADO</td><td>51 ms</td></tr><tr><td>TF-13 - Atualizar produto com preço negativo</td><td class="APROVADO">APROVADO</td><td>58 ms</td></tr><tr><td>TF-17 - Excluir produto inexistente</td><td class="APROVADO">APROVADO</td><td>46 ms</td></tr><tr><td>TF-14 - Atualizar produto com quantidade negativa</td><td class="APROVADO">APROVADO</td><td>43 ms</td></tr><tr><td>TF-06 - Cadastrar produto sem nome</td><td class="APROVADO">APROVADO</td><td>45 ms</td></tr><tr><td>TF-08 - Cadastrar produto com preço negativo</td><td class="APROVADO">APROVADO</td><td>41 ms</td></tr><tr><td>TF-01 - Cadastrar produto com dados válidos</td><td class="APROVADO">APROVADO</td><td>99 ms</td></tr><tr><td>TF-16 - Atualizar produto sem preço</td><td class="APROVADO">APROVADO</td><td>51 ms</td></tr><tr><td>TF-10 - Listar produto inexistente</td><td class="APROVADO">APROVADO</td><td>42 ms</td></tr><tr><td>TF-04 - Listar todos os produtos</td><td class="APROVADO">APROVADO</td><td>60 ms</td></tr><tr><td>TF-07 - Cadastrar produto sem preço</td><td class="APROVADO">APROVADO</td><td>48 ms</td></tr><tr><td>TF-15 - Atualizar produto sem nome</td><td class="APROVADO">APROVADO</td><td>37 ms</td></tr><tr><td>TF-02 - Atualizar produto com dados válidos</td><td class="APROVADO">APROVADO</td><td>41 ms</td></tr><tr><td>TF-05 - Listar produto específico</td><td class="APROVADO">APROVADO</td><td>141 ms</td></tr><tr><td>TF-11 - Atualizar produto inexistente</td><td class="REPROVADO">REPROVADO</td><td>46 ms</td></tr><tr><td>TF-00 - Validar status do sistema</td><td class="APROVADO">APROVADO</td><td>123 ms</td></tr>    </table>
 
 </body>
 
