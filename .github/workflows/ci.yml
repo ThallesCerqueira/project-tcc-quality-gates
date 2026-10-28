@@ -2,16 +2,22 @@ name: CI — Testes de API
 
 on:
   push:
-    branches: [main, develop, experimento/v1-critico, experimento/v2-abaixo-90, experimento/v3-http-5xx, experimento/v4-nao-critico]
+    branches:
+      - main
+      - develop
+      - experimento/v1-critico
+      - experimento/v2-abaixo-90
+      - experimento/v3-http-5xx
+      - experimento/v4-nao-critico
 
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
 
-  # ─────────────────────────────────────────────
-  # JOB 1: Testes automatizados da API
-  # ─────────────────────────────────────────────
   testes-api:
     name: Testes de API
     runs-on: ubuntu-latest
@@ -33,11 +39,9 @@ jobs:
 
     steps:
 
-      # ── Checkout ─────────────────────────────
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      # ── Backend ──────────────────────────────
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
@@ -61,8 +65,7 @@ jobs:
 
       - name: Subir backend
         working-directory: backend
-        run: |
-          npm start > backend.log 2>&1 &
+        run: npm start > backend.log 2>&1 &
         env:
           PORT: 3001
           DB_HOST: localhost
@@ -73,11 +76,8 @@ jobs:
 
       - name: Aguardar API
         run: |
-          echo "Aguardando backend..."
-
           for i in {1..30}; do
             if curl --fail http://localhost:3001/health; then
-              echo ""
               echo "Backend disponível."
               exit 0
             fi
@@ -88,7 +88,6 @@ jobs:
           echo "Backend não iniciou corretamente."
           exit 1
 
-      # ── Java / RestAssured ───────────────────
       - name: Configurar Java
         uses: actions/setup-java@v4
         with:
@@ -102,27 +101,23 @@ jobs:
         run: mvn clean test
         env:
           BASE_URL: http://localhost:3001
-          APP_VERSION: referencia
+          APP_VERSION: ${{ github.ref_name }}
 
-      # ── Quality Gate ─────────────────────────
       - name: Avaliar Quality Gate
         if: always()
         working-directory: api-tests
         run: bash scripts/quality-gate.sh
 
-      # ── Verificação ──────────────────────────
       - name: Verificar arquivos gerados
         if: always()
         run: |
-          echo "=== Arquivos gerados ==="
           find api-tests/target -maxdepth 2 -type f
 
-      # ── Artifact comum ───────────────────────
       - name: Publicar resultados dos testes
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: resultados-testes-api
+          name: resultados-testes-api-${{ github.run_number }}
           path: |
             api-tests/target/test-report.html
             api-tests/target/quality-gate.properties
@@ -130,53 +125,29 @@ jobs:
             api-tests/target/surefire-reports/
           retention-days: 7
 
-      # ── GitHub Pages ─────────────────────────
-      - name: Preparar relatório para GitHub Pages
+      - name: Definir pasta do relatório
         if: always() && github.event_name != 'pull_request'
         run: |
-          mkdir -p api-tests/pages
-          cp api-tests/target/test-report.html api-tests/pages/index.html
+          BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
+          echo "REPORT_PATH=$BRANCH_NAME" >> "$GITHUB_ENV"
 
-      - name: Configurar GitHub Pages
+      - name: Preparar relatório
         if: always() && github.event_name != 'pull_request'
-        uses: actions/configure-pages@v5
+        run: |
+          mkdir -p public
+          cp api-tests/target/test-report.html public/index.html
 
-      - name: Enviar relatório para GitHub Pages
+      - name: Publicar relatório no GitHub Pages
         if: always() && github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v4
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: api-tests/pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./public
+          destination_dir: ${{ env.REPORT_PATH }}
+          keep_files: true
 
 
-  # ─────────────────────────────────────────────
-  # JOB 2: Publicação do relatório HTML
-  # ─────────────────────────────────────────────
-  deploy-report:
-    name: Publicar relatório HTML
-    runs-on: ubuntu-latest
-    needs: testes-api
-
-    if: always() && github.event_name != 'pull_request'
-
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Publicar relatório
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-
-  # ─────────────────────────────────────────────
-  # JOB 3: Build das imagens
-  # Executado somente se o Quality Gate for aprovado
-  # ─────────────────────────────────────────────
   build:
     name: Build Docker
     runs-on: ubuntu-latest
