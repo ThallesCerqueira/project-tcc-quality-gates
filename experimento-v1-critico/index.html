@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Relatório de Execução dos Testes
+    </title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 30px;
+            background-color: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .APROVADO {
+            color: green;
+            font-weight: bold;
+        }
+
+        .REPROVADO {
+            color: red;
+            font-weight: bold;
+        }
+
+        .ABORTADO {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .resumo {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            min-width: 160px;
+        }
+
+        .card strong {
+            display: block;
+            font-size: 22px;
+            margin-top: 5px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>
+        Relatório de Execução dos Testes
+    </h1>
+
+    <h2>
+        Identificação da execução
+    </h2>
+
+    <table>
+
+        <tr>
+            <th>Informação</th>
+            <th>Valor</th>
+        </tr>
+<tr><td>Data/Hora</td><td>28/10/2026 00:50:47</td></tr><tr><td>Versão</td><td>experimento/v1-critico</td></tr><tr><td>Branch</td><td>experimento/v1-critico</td></tr><tr><td>Commit</td><td>1d20d15</td></tr><tr><td>Execução do pipeline</td><td>#21</td></tr><tr><td>Ambiente</td><td>http://localhost:3001</td></tr>    </table>
+
+    <h2>
+        Resumo da execução
+    </h2>
+
+    <div class="resumo">
+<div class="card">Total<strong>18</strong></div><div class="card">Aprovados<strong>17</strong></div><div class="card">Reprovados<strong>1</strong></div><div class="card">Abortados<strong>0</strong></div><div class="card">Testes críticos<strong>6</strong></div><div class="card">Críticos aprovados<strong>5</strong></div><div class="card">Percentual aprovado<strong>94.44%</strong></div><div class="card">HTTP 5xx inesperados<strong>0</strong></div><div class="card">Critério HTTP 5xx<strong>ATENDIDO</strong></div>    </div>
+
+    <h2>
+        Resultados dos testes
+    </h2>
+
+    <table>
+
+        <tr>
+            <th>Teste</th>
+            <th>Status</th>
+            <th>Tempo de execução</th>
+        </tr>
+<tr><td>TF-12 - Atualizar produto e validar persistência dos dados</td><td class="APROVADO">APROVADO</td><td>1561 ms</td></tr><tr><td>TF-03 - Excluir produto e confirmar exclusão</td><td class="REPROVADO">REPROVADO</td><td>41 ms</td></tr><tr><td>TF-09 - Cadastrar produto com quantidade negativa</td><td class="APROVADO">APROVADO</td><td>45 ms</td></tr><tr><td>TF-13 - Atualizar produto com preço negativo</td><td class="APROVADO">APROVADO</td><td>45 ms</td></tr><tr><td>TF-17 - Excluir produto inexistente</td><td class="APROVADO">APROVADO</td><td>42 ms</td></tr><tr><td>TF-14 - Atualizar produto com quantidade negativa</td><td class="APROVADO">APROVADO</td><td>44 ms</td></tr><tr><td>TF-06 - Cadastrar produto sem nome</td><td class="APROVADO">APROVADO</td><td>63 ms</td></tr><tr><td>TF-08 - Cadastrar produto com preço negativo</td><td class="APROVADO">APROVADO</td><td>47 ms</td></tr><tr><td>TF-01 - Cadastrar produto com dados válidos</td><td class="APROVADO">APROVADO</td><td>103 ms</td></tr><tr><td>TF-16 - Atualizar produto sem preço</td><td class="APROVADO">APROVADO</td><td>39 ms</td></tr><tr><td>TF-10 - Listar produto inexistente</td><td class="APROVADO">APROVADO</td><td>37 ms</td></tr><tr><td>TF-04 - Listar todos os produtos</td><td class="APROVADO">APROVADO</td><td>40 ms</td></tr><tr><td>TF-07 - Cadastrar produto sem preço</td><td class="APROVADO">APROVADO</td><td>34 ms</td></tr><tr><td>TF-15 - Atualizar produto sem nome</td><td class="APROVADO">APROVADO</td><td>33 ms</td></tr><tr><td>TF-02 - Atualizar produto com dados válidos</td><td class="APROVADO">APROVADO</td><td>34 ms</td></tr><tr><td>TF-05 - Listar produto específico</td><td class="APROVADO">APROVADO</td><td>107 ms</td></tr><tr><td>TF-11 - Atualizar produto inexistente</td><td class="APROVADO">APROVADO</td><td>29 ms</td></tr><tr><td>TF-00 - Validar status do sistema</td><td class="APROVADO">APROVADO</td><td>65 ms</td></tr>    </table>
+
+</body>
+
+</html>
