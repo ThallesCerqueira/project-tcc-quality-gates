@@ -35,7 +35,7 @@ async function criarProduto(req, res) {
   }
 
   if (typeof preco !== 'number' || preco < 0) {
-    return res.status(400).json({ erro: 'O campo "preco" deve ser um número maior ou igual a 0' });
+    return res.status(422).json({ erro: 'O campo "preco" deve ser um número maior ou igual a 0' });
   }
 
   if (quantidade !== undefined && (typeof quantidade !== 'number' || quantidade < 0)) {
