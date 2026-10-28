@@ -179,6 +179,7 @@ public class ProductTest extends BaseTest {
         Response getResponse = productPage.getByProductId(productId);
 
         assertEquals(200, getResponse.statusCode());
+        
         assertThat(
                 getResponse.path("nome"),
                 equalTo(putResponse.path("nome"))
