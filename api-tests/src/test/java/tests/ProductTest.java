@@ -68,14 +68,18 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-03 - Excluir produto")
+    @DisplayName("TF-03 - Excluir produto e confirmar exclusão")
     @Tag("critical")
-    public void deleteProductIdTest() {
+    public void deleteProductAndConfirmDeletionTest() {
 
         shouldDelete = false;
+
         response = productPage.deleteProductId(productId);
         assertEquals(204, response.statusCode());
 
+        Response getResponse = productPage.getByProductId(productId);
+
+        assertEquals(404, getResponse.statusCode());
     }
 
     @Test
@@ -90,7 +94,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-04 - Listar produto específico")
+    @DisplayName("TF-05 - Listar produto específico")
     @Tag("critical")
     public void getByProductIdTest() {
 
@@ -112,7 +116,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-05 - Cadastrar produto sem nome")
+    @DisplayName("TF-06 - Cadastrar produto sem nome")
     public void createProductWithoutNameTest() {
 
         response = productPage.createProductWithoutName();
@@ -121,7 +125,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-06 - Cadastrar produto sem preço")
+    @DisplayName("TF-07 - Cadastrar produto sem preço")
     public void createProductWithoutPriceTest() {
 
         response = productPage.createProductWithoutPrice();
@@ -130,7 +134,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-07 - Cadastrar produto com preço negativo")
+    @DisplayName("TF-08 - Cadastrar produto com preço negativo")
     public void createProductWithNegativePriceTest() {
 
         response = productPage.createProductWithNegativePrice();
@@ -139,7 +143,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-08 - Cadastrar produto com quantidade negativa")
+    @DisplayName("TF-09 - Cadastrar produto com quantidade negativa")
     public void createProductWithNegativeQuantityTest() {
 
         response = productPage.createProductWithNegativeQuantity();
@@ -148,7 +152,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-09 - Listar produto inexistente")
+    @DisplayName("TF-10 - Listar produto inexistente")
     public void getProductByInexistentIdTest() {
 
         response = productPage.getByProductId(productId + 99);
@@ -157,7 +161,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-10 - Atualizar produto inexistente")
+    @DisplayName("TF-11 - Atualizar produto inexistente")
     public void updateInexistentProductTest() {
 
       response = productPage.putProduct(productId + 123);
@@ -166,7 +170,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-11 - Atualizar produto e validar persistência dos dados")
+    @DisplayName("TF-12 - Atualizar produto e validar persistência dos dados")
     public void putProductPersistenceTest() {
 
         Response putResponse = productPage.putProduct(productId);
@@ -182,7 +186,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-12 - Atualizar produto com preço negativo")
+    @DisplayName("TF-13 - Atualizar produto com preço negativo")
     public void updateProductWithNegativePriceTest() {
 
         response = productPage.putProductWithNegativePrice(productId);
@@ -191,7 +195,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-13 - Atualizar produto com quantidade negativa")
+    @DisplayName("TF-14 - Atualizar produto com quantidade negativa")
     public void updateProductWithNegativeQuantityTest() {
 
         response = productPage.putProductWithNegativeQuantity(productId);
@@ -200,7 +204,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-14 - Atualizar produto sem nome")
+    @DisplayName("TF-15 - Atualizar produto sem nome")
     public void updateProductWithoutNameTest() {
 
         response = productPage.putProductWithoutName(productId);
@@ -209,7 +213,7 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-15 - Atualizar produto sem preço")
+    @DisplayName("TF-16 - Atualizar produto sem preço")
     public void updateProductWithoutPriceTest() {
 
         response = productPage.putProductWithoutPrice(productId);
@@ -218,27 +222,12 @@ public class ProductTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("TF-16 - Excluir produto inexistente")
+    @DisplayName("TF-17 - Excluir produto inexistente")
     public void deleteInexistentProductTest() {
 
         response = productPage.deleteProductId(productId + 999);
 
         assertEquals(404, response.statusCode());
-    }
-
-    @Test
-    @DisplayName("TF-17 - Excluir produto e confirmar exclusão")
-    public void deleteProductAndConfirmDeletionTest() {
-
-        response = productPage.deleteProductId(productId);
-
-        assertEquals(204, response.statusCode());
-
-        shouldDelete = false;
-
-        Response getResponse = productPage.getByProductId(productId);
-
-        assertEquals(404, getResponse.statusCode());
     }
 
 }

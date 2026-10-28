@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class HealthTest extends BaseTest {
 
     @Test
-    @DisplayName("TF-01 - Validar status do sistema")
+    @DisplayName("TF-00 - Validar status do sistema")
     @Tag("critical")
     public void deveRetornarStatus200NoHealthCheck() {
 
