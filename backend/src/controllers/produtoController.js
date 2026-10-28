@@ -101,7 +101,7 @@ async function removerProduto(req, res) {
       return res.status(404).json({ erro: 'Produto não encontrado' });
     }
 
-    res.status(204).send();
+    res.status(200).send();
   } catch (err) {
     console.error(err);
     res.status(500).json({ erro: 'Erro ao remover produto' });
