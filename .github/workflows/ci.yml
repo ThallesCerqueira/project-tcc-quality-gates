@@ -2,7 +2,7 @@ name: CI — Testes de API
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, experimento/v1-critico, experimento/v2-abaixo-90, experimento/v3-http-5xx, experimento/v4-nao-critico]
 
   pull_request:
     branches: [main]
