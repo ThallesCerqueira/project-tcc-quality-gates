@@ -4,6 +4,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
 import org.junit.platform.launcher.TestPlan;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -142,72 +143,55 @@ public class QualityGateListener implements TestExecutionListener {
         );
     }
 
-    private void generateHtmlReport()
-            throws IOException {
+    private void generateHtmlReport() throws IOException {
 
-        StringBuilder html =
-                new StringBuilder();
+        StringBuilder html = new StringBuilder();
 
-        String dataExecucao =
-                LocalDateTime.now()
-                        .format(
-                                DateTimeFormatter.ofPattern(
-                                        "dd/MM/yyyy HH:mm:ss"
-                                )
-                        );
+        String dataExecucao = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
 
-        String versao =
-                System.getenv()
-                        .getOrDefault(
-                                "APP_VERSION",
-                                "Execução local"
-                        );
+        String versao = System.getenv()
+                .getOrDefault("APP_VERSION", "Execução local");
 
-        String branch =
-                System.getenv()
-                        .getOrDefault(
-                                "GITHUB_REF_NAME",
-                                "local"
-                        );
+        String branch = System.getenv()
+                .getOrDefault("GITHUB_REF_NAME", "local");
 
-        String commit =
-                System.getenv()
-                        .getOrDefault(
-                                "GITHUB_SHA",
-                                "local"
-                        );
+        String commit = System.getenv()
+                .getOrDefault("GITHUB_SHA", "local");
 
-        if (!commit.equals("local")
-                && commit.length() > 7) {
-
-            commit =
-                    commit.substring(0, 7);
+        if (!commit.equals("local") && commit.length() > 7) {
+            commit = commit.substring(0, 7);
         }
 
-        String pipeline =
-                System.getenv()
-                        .getOrDefault(
-                                "GITHUB_RUN_NUMBER",
-                                "local"
-                        );
+        String pipeline = System.getenv()
+                .getOrDefault("GITHUB_RUN_NUMBER", "local");
 
-        String ambiente =
-                System.getenv()
-                        .getOrDefault(
-                                "BASE_URL",
-                                "http://localhost:3002"
-                        );
+        String ambiente = System.getenv()
+                .getOrDefault("BASE_URL", "http://localhost:3002");
 
         double percentualAprovacao = 0;
 
         if (totalTests > 0) {
-
             percentualAprovacao =
-                    ((double) passedTests / totalTests)
-                            * 100;
+                    ((double) passedTests / totalTests) * 100;
         }
 
         long unexpected5xx = countUnexpected5xx();
+
+        boolean criterioCriticos =
+                criticalTotal > 0 &&
+                        criticalPassed == criticalTotal;
+
+        boolean criterioPercentual =
+                percentualAprovacao >= 90;
+
+        boolean criterio5xx =
+                unexpected5xx == 0;
+
+        boolean qualityGateAprovado =
+                criterioCriticos &&
+                        criterioPercentual &&
+                        criterio5xx;
 
         html.append("""
                 <!DOCTYPE html>
@@ -252,7 +236,7 @@ public class QualityGateListener implements TestExecutionListener {
                 
                         th,
                         td {
-                            border: 1px solid #ddd;
+                            border: 1px solid #fddd;
                             padding: 10px;
                             text-align: left;
                         }
@@ -297,6 +281,34 @@ public class QualityGateListener implements TestExecutionListener {
                             margin-top: 5px;
                         }
                 
+                        .criterio-atendido {
+                            color: green;
+                            font-weight: bold;
+                        }
+                
+                        .criterio-nao-atendido {
+                            color: red;
+                            font-weight: bold;
+                        }
+                
+                        .gate-status {
+                            background-color: white;
+                            border: 1px solid #ddd;
+                            border-left: 4px solid;
+                            padding: 12px 15px;
+                            margin-bottom: 30px;
+                        }
+                
+                        .gate-aprovado {
+                            border-left-color: green;
+                            color: green;
+                        }
+                
+                        .gate-reprovado {
+                            border-left-color: red;
+                            color: red;
+                        }
+                
                     </style>
                 
                 </head>
@@ -319,41 +331,12 @@ public class QualityGateListener implements TestExecutionListener {
                         </tr>
                 """);
 
-        appendRow(
-                html,
-                "Data/Hora",
-                dataExecucao
-        );
-
-        appendRow(
-                html,
-                "Versão",
-                versao
-        );
-
-        appendRow(
-                html,
-                "Branch",
-                branch
-        );
-
-        appendRow(
-                html,
-                "Commit",
-                commit
-        );
-
-        appendRow(
-                html,
-                "Execução do pipeline",
-                "#" + pipeline
-        );
-
-        appendRow(
-                html,
-                "Ambiente",
-                ambiente
-        );
+        appendRow(html, "Data/Hora", dataExecucao);
+        appendRow(html, "Versão", versao);
+        appendRow(html, "Branch", branch);
+        appendRow(html, "Commit", commit);
+        appendRow(html, "Execução do pipeline", "#" + pipeline);
+        appendRow(html, "Ambiente", ambiente);
 
         html.append("""
                     </table>
@@ -385,12 +368,6 @@ public class QualityGateListener implements TestExecutionListener {
 
         appendCard(
                 html,
-                "Abortados",
-                String.valueOf(abortedTests)
-        );
-
-        appendCard(
-                html,
                 "Testes críticos",
                 String.valueOf(criticalTotal)
         );
@@ -416,17 +393,60 @@ public class QualityGateListener implements TestExecutionListener {
                 String.valueOf(unexpected5xx)
         );
 
-        appendCard(
-                html,
-                "Critério HTTP 5xx",
-                unexpected5xx == 0
-                        ? "ATENDIDO"
-                        : "NÃO ATENDIDO"
-        );
-
         html.append("""
                     </div>
                 
+                    <h2>
+                        Avaliação do Quality Gate
+                    </h2>
+                
+                    <table>
+                
+                        <tr>
+                            <th>Critério</th>
+                            <th>Resultado</th>
+                        </tr>
+                """);
+
+        appendCriterionRow(
+                html,
+                "100% dos testes críticos aprovados",
+                criterioCriticos
+        );
+
+        appendCriterionRow(
+                html,
+                "Pelo menos 90% da suíte aprovada",
+                criterioPercentual
+        );
+
+        appendCriterionRow(
+                html,
+                "Nenhum HTTP 5xx inesperado",
+                criterio5xx
+        );
+
+        html.append("</table>");
+
+        html.append(
+                "<div class=\"gate-status " +
+                        (qualityGateAprovado
+                                ? "gate-aprovado"
+                                : "gate-reprovado") +
+                        "\">"
+        );
+
+        html.append("<strong>Quality Gate: ")
+                .append(
+                        qualityGateAprovado
+                                ? "APROVADO"
+                                : "REPROVADO"
+                )
+                .append("</strong>");
+
+        html.append("</div>");
+
+        html.append("""
                     <h2>
                         Resultados dos testes
                     </h2>
@@ -477,6 +497,34 @@ public class QualityGateListener implements TestExecutionListener {
                 ),
                 html.toString()
         );
+    }
+
+    private void appendCriterionRow(
+            StringBuilder html,
+            String criterio,
+            boolean atendido) {
+
+        html.append("<tr>");
+
+        html.append("<td>")
+                .append(escapeHtml(criterio))
+                .append("</td>");
+
+        html.append("<td class=\"")
+                .append(
+                        atendido
+                                ? "criterio-atendido"
+                                : "criterio-nao-atendido"
+                )
+                .append("\">")
+                .append(
+                        atendido
+                                ? "ATENDIDO"
+                                : "NÃO ATENDIDO"
+                )
+                .append("</td>");
+
+        html.append("</tr>");
     }
 
     private void appendRow(
